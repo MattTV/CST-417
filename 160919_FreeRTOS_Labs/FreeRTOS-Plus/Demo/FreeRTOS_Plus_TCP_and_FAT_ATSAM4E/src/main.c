@@ -186,7 +186,7 @@ See http://www.freertos.org/FreeRTOS-Plus/FreeRTOS_Plus_TCP/TCP_Echo_Server.html
 /* Define names that will be used for DNS, LLMNR and NBNS searches.  This allows
 mainHOST_NAME to be used when the IP address is not known.  For example
 "ping RTOSDemo" to resolve RTOSDemo to an IP address then send a ping request. */
-#define mainHOST_NAME					"TroyAtmel"
+#define mainHOST_NAME					"kk"
 #define mainDEVICE_NICK_NAME			"sam4expro"
 
 /* The LED to toggle and the rate at which the LED will be toggled. */

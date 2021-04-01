@@ -210,8 +210,8 @@ each node on the network has a unique MAC address. */
 #define configMAC_ADDR1		0x04
 #define configMAC_ADDR2		0x25
 #define configMAC_ADDR3		0x1c
-#define configMAC_ADDR4		0xbb
-#define configMAC_ADDR5		0xf5
+#define configMAC_ADDR4		0xb9
+#define configMAC_ADDR5		0xaa
 
 /* Default IP address configuration.  Used in case ipconfigUSE_DHCP is set to 0, or
 ipconfigUSE_DHCP is set to 1 but a DHCP server cannot be contacted. */
@@ -248,8 +248,8 @@ http://www.freertos.org/FreeRTOS-Plus/FreeRTOS_Plus_TCP/TCP_Echo_Clients.html
 http://www.freertos.org/FreeRTOS-Plus/FreeRTOS_Plus_TCP/UDP_Echo_Clients.html */
 #define configECHO_SERVER_ADDR0	10
 #define configECHO_SERVER_ADDR1 101
-#define configECHO_SERVER_ADDR2 1
-#define configECHO_SERVER_ADDR3 58
+#define configECHO_SERVER_ADDR2 134
+#define configECHO_SERVER_ADDR3 66
 
 /* The root directory for the HTTP/web server. */
 #define configHTTP_ROOT "/websrc"
@@ -289,8 +289,8 @@ logging as e.g.: */
 
 #define configUDP_LOGGING_ADDR0	10
 #define configUDP_LOGGING_ADDR1	101
-#define configUDP_LOGGING_ADDR2	1
-#define configUDP_LOGGING_ADDR3	58
+#define configUDP_LOGGING_ADDR2	134
+#define configUDP_LOGGING_ADDR3	66
 
 /*
 If not defined, the local broadcast address will be used, e.g. 192.168.0.255
