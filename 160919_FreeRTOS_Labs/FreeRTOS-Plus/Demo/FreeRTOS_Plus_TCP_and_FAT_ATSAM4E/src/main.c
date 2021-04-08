@@ -106,6 +106,9 @@
 #include "conf_board.h"
 #include <asf.h>
 
+// My Includes
+#include "myCommands.h"
+
 
 /* Set the following constants to 1 or 0 to define which tasks to include and
 exclude.  A WIDER RANGE OF EXAMPLES ARE AVAILABLE IN THE WIN32 DEMO:
@@ -139,11 +142,11 @@ FreeRTOS+TCP using a tool such as EchoTool https://github.com/PavelBansky/EchoTo
 (a pre-built binary is available).
 See http://www.freertos.org/FreeRTOS-Plus/FreeRTOS_Plus_TCP/TCP_Echo_Server.html
 */
-#define mainCREATE_FTP_SERVER					1
-#define mainCREATE_HTTP_SERVER 					1
+#define mainCREATE_FTP_SERVER					0
+#define mainCREATE_HTTP_SERVER 					0
 #define mainCREATE_UDP_CLI_TASKS				1
-#define mainCREATE_TCP_ECHO_CLIENT_TASKS_SINGLE	1
-#define mainCREATE_SIMPLE_TCP_ECHO_SERVER		1
+#define mainCREATE_TCP_ECHO_CLIENT_TASKS_SINGLE	0
+#define mainCREATE_SIMPLE_TCP_ECHO_SERVER		0
 #define mainCREATE_UDP_LOGGING_TASK 			1
 
 /* FTP and HTTP servers execute in the TCP server work task. */
@@ -169,7 +172,7 @@ See http://www.freertos.org/FreeRTOS-Plus/FreeRTOS_Plus_TCP/TCP_Echo_Server.html
 /* Other configuration parameters -------------------------------------------*/
 
 /* The SD card is mounted in the root of the file system. */
-#define mainHAS_SDCARD					1
+#define mainHAS_SDCARD					0
 #define mainSD_CARD_DISK_NAME			"/"
 #define mainSD_CARD_TESTING_DIRECTORY	"/fattest"
 
@@ -212,7 +215,7 @@ mainHOST_NAME to be used when the IP address is not known.  For example
 static void prvSRand( UBaseType_t ulSeed );
 
 /*
- * Miscellaneous initialisation including preparing the logging and seeding the
+ * Miscellaneous initialization including preparing the logging and seeding the
  * random number generator.
  */
 static void prvMiscInitialisation( void );
@@ -309,13 +312,13 @@ extern char _estack;
 /* See http://www.FreeRTOS.org/FreeRTOS-Plus/FreeRTOS_Plus_TCP/TCPIP_FAT_Examples_Atmel_SAM4E.html */
 int main(void)
 {
-TimerHandle_t xLEDTimer;
+    TimerHandle_t xLEDTimer;
 
-	/* Miscellaneous initialisation including preparing the logging and seeding
+    /* Miscellaneous initialization including preparing the logging and seeding
 	the random number generator. */
-	prvMiscInitialisation();
+	prvMiscInitialisation(); // Probably was the one that had Breakpoint
 
-	/* Initialise the network interface.
+    /* Initialize the network interface.
 
 	***NOTE*** Tasks that use the network are created in the network event hook
 	when the network is connected and ready for use (see the definition of
@@ -328,10 +331,10 @@ TimerHandle_t xLEDTimer;
 	#if( ( mainCREATE_FTP_SERVER == 1 ) || ( mainCREATE_HTTP_SERVER == 1 ) )
 	{
 		/* Create the task that handles the FTP and HTTP servers.  This will
-		initialise the file system then wait for a notification from the network
+		initialize the file system then wait for a notification from the network
 		event hook before creating the servers.  The task is created at the idle
 		priority, and sets itself to mainTCP_SERVER_TASK_PRIORITY after the file
-		system has initialised. */
+		system has initialized. */
 		xTaskCreate( prvServerWorkTask, "SvrWork", mainTCP_SERVER_STACK_SIZE, NULL, tskIDLE_PRIORITY, &xServerWorkTaskHandle );
 	}
 	#endif
@@ -428,7 +431,7 @@ TimerHandle_t xLEDTimer;
 		vRegisterFileSystemCLICommands();
 
 		/* The priority of this task can be raised now the disk has been
-		initialised. */
+		initialized. */
 		vTaskPrioritySet( NULL, mainTCP_SERVER_TASK_PRIORITY );
 
 		/* Wait until the network is up before creating the servers.  The
@@ -512,11 +515,11 @@ TimerHandle_t xLEDTimer;
 
 void vAssertCalled( const char *pcFile, uint32_t ulLine )
 {
-volatile uint32_t ulBlockVariable = 0UL;
-volatile const char *pcAssertedFileName;
-volatile int iAssertedErrno;
-volatile uint32_t ulAssertedLine;
-volatile FF_Error_t xAssertedFF_Error;
+    volatile uint32_t ulBlockVariable = 0UL;
+    volatile const char *pcAssertedFileName;
+    volatile int iAssertedErrno;
+    volatile uint32_t ulAssertedLine;
+    volatile FF_Error_t xAssertedFF_Error;
 
 	ulAssertedLine = ulLine;
 	iAssertedErrno = stdioGET_ERRNO();
@@ -561,11 +564,11 @@ volatile FF_Error_t xAssertedFF_Error;
 events are only received if implemented in the MAC driver. */
 void vApplicationIPNetworkEventHook( eIPCallbackEvent_t eNetworkEvent )
 {
-uint32_t ulIPAddress, ulNetMask, ulGatewayAddress, ulDNSServerAddress;
-char cBuffer[ 16 ];
-static BaseType_t xTasksAlreadyCreated = pdFALSE;
+    uint32_t ulIPAddress, ulNetMask, ulGatewayAddress, ulDNSServerAddress;
+    char cBuffer[ 16 ];
+    static BaseType_t xTasksAlreadyCreated = pdFALSE;
 
-	FreeRTOS_printf( ( "vApplicationIPNetworkEventHook: event %ld\n", eNetworkEvent ) );
+    FreeRTOS_printf( ( "vApplicationIPNetworkEventHook: event %ld\n", eNetworkEvent ) );
 
 	/* If the network has just come up...*/
 	if( eNetworkEvent == eNetworkUp )
@@ -579,6 +582,7 @@ static BaseType_t xTasksAlreadyCreated = pdFALSE;
 			/* Start a new task to fetch logging lines and send them out. */
 			#if( mainCREATE_UDP_LOGGING_TASK == 1 )
 			{
+                FreeRTOS_printf( ("Welcome to CST 417 - Embedded Networking\n\n") );
 				vUDPLoggingTaskCreate();
 			}
 			#endif
@@ -609,8 +613,10 @@ static BaseType_t xTasksAlreadyCreated = pdFALSE;
 			registered from the TCP server task. */
 			#if( mainCREATE_UDP_CLI_TASKS == 1 )
 			{
-				vRegisterSampleCLICommands();
-				vRegisterTCPCLICommands();
+                FreeRTOS_printf( ("Registering CLI Commands\n") );
+                vRegisterMyCommands();
+				//vRegisterSampleCLICommands();
+				//vRegisterTCPCLICommands();
 				vStartUDPCommandInterpreterTask( mainUDP_CLI_TASK_STACK_SIZE, mainUDP_CLI_PORT_NUMBER, mainUDP_CLI_TASK_PRIORITY );
 			}
 			#endif
@@ -843,4 +849,28 @@ void HardFault_Handler( void )
 	while (1)
 	{
 	}
+}
+
+
+void vApplicationPingReplyHook( ePingReplyStatus_t eStatus, uint16_t usIdentifier )
+{
+    FreeRTOS_printf( ("vApplicationPingReplyHook Called\n") );
+    
+    switch( eStatus )
+    {
+        case eSuccess    :
+            /* A valid ping reply has been received.  Post the sequence number
+            on the queue that is read by the vSendPing() function below.  Do
+            not wait more than 10ms trying to send the message if it cannot be
+            sent immediately because this function is called from the IP stack
+            task - blocking in this function will block the IP stack. */
+            FreeRTOS_printf( ("Valid Ping received: %u\n", usIdentifier) );
+            break;
+
+        case eInvalidChecksum :
+        case eInvalidData :
+            /* A reply was received but it was not valid. */
+            FreeRTOS_printf( ("InValid Ping received: %u\n", usIdentifier) );
+            break;
+    }
 }
