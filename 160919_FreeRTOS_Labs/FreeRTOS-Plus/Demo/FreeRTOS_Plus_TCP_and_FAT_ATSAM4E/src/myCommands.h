@@ -1,13 +1,17 @@
 /*************************************************************
- * Author:          Troy Scevers
+ * Author:          Troy Scevers and Matt Volpe
  * Filename:		myCommands.c
  * Date Created:	4/16/2018
  * Modifications:   
+ *	April 6, 2021 - Added definitions for commands get-mac, get-ip, get-gateway, get-dns, get-netmask, and send-arp.
+ *  April 9, 2021 - Updated this header block.
  *
  * Lab/Assignment:	UDP CLI Commands
  *
  * Overview:
- *  
+ *  This document defines commands that can be executed on the
+ *	device by a user using the program YAT or one with similar
+ *	functionality.
  ************************************************************/
 #ifndef MYCOMMANDS_H_
 #define MYCOMMANDS_H_
