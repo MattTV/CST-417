@@ -108,6 +108,7 @@
 
 // My Includes
 #include "myCommands.h"
+#include "myEchoServer.h"
 
 
 /* Set the following constants to 1 or 0 to define which tasks to include and
@@ -146,8 +147,9 @@ See http://www.freertos.org/FreeRTOS-Plus/FreeRTOS_Plus_TCP/TCP_Echo_Server.html
 #define mainCREATE_HTTP_SERVER 					0
 #define mainCREATE_UDP_CLI_TASKS				1
 #define mainCREATE_TCP_ECHO_CLIENT_TASKS_SINGLE	0
-#define mainCREATE_SIMPLE_TCP_ECHO_SERVER		0
+#define mainCREATE_SIMPLE_TCP_ECHO_SERVER		1
 #define mainCREATE_UDP_LOGGING_TASK 			1
+#define mainCreate_MY_TCP_ECHO_SERVER			1
 
 /* FTP and HTTP servers execute in the TCP server work task. */
 #define mainTCP_SERVER_TASK_PRIORITY	( tskIDLE_PRIORITY + 1 )
@@ -639,6 +641,13 @@ void vApplicationIPNetworkEventHook( eIPCallbackEvent_t eNetworkEvent )
 		FreeRTOS_inet_ntoa( ulDNSServerAddress, cBuffer );
 		FreeRTOS_printf( ( "DNS Server Address: %s\n", cBuffer ) );
 	}
+	
+	#if(mainCreate_MY_TCP_ECHO_SERVER == 1)
+	{
+		FreeRTOS_printf(("Starting My Echo Server\n"));
+		StartMyEchoTCPServerTasks(mainECHO_SERVER_STACK_SIZE, mainECHO_SERVER_TASK_PRIORITY);
+	}
+	#endif
 }
 /*-----------------------------------------------------------*/
 

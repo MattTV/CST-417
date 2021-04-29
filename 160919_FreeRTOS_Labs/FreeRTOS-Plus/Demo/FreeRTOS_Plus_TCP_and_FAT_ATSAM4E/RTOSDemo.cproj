@@ -849,6 +849,12 @@
     <Compile Include="src\myCommands.h">
       <SubType>compile</SubType>
     </Compile>
+    <Compile Include="src\myEchoServer.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\myEchoServer.h">
+      <SubType>compile</SubType>
+    </Compile>
     <None Include="src\asf.h">
       <SubType>compile</SubType>
     </None>

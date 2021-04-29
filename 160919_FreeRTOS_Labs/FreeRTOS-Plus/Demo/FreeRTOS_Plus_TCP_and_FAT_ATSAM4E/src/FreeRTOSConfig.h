@@ -249,7 +249,7 @@ http://www.freertos.org/FreeRTOS-Plus/FreeRTOS_Plus_TCP/UDP_Echo_Clients.html */
 #define configECHO_SERVER_ADDR0	10
 #define configECHO_SERVER_ADDR1 101
 #define configECHO_SERVER_ADDR2 134
-#define configECHO_SERVER_ADDR3 66
+#define configECHO_SERVER_ADDR3 59
 
 /* The root directory for the HTTP/web server. */
 #define configHTTP_ROOT "/websrc"
@@ -290,7 +290,7 @@ logging as e.g.: */
 #define configUDP_LOGGING_ADDR0	10
 #define configUDP_LOGGING_ADDR1	101
 #define configUDP_LOGGING_ADDR2	134
-#define configUDP_LOGGING_ADDR3	66
+#define configUDP_LOGGING_ADDR3	59
 
 /*
 If not defined, the local broadcast address will be used, e.g. 192.168.0.255
