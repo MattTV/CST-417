@@ -5,6 +5,7 @@
  * Modifications:   
  *	April 6, 2021 - Added definitions for commands get-mac, get-ip, get-gateway, get-dns, get-netmask, and send-arp.
  *  April 9, 2021 - Updated this header block.
+ *	May 13, 2021  - Added prvSendUDPMessageCommand declaration for the udp-send command.
  *
  * Lab/Assignment:	UDP CLI Commands
  *
@@ -30,5 +31,6 @@ BaseType_t prvGetNetmaskCommand(char *pcWriteBuffer, size_t xWriteBufferLen, con
 BaseType_t prvOutputARPCommand(char *pcWriteBuffer, size_t xWriteBufferLen, const char *pcCommandString);
 BaseType_t prvArpReqCommand(char *pcWriteBuffer, size_t xWriteBufferLen, const char *pcCommandString);
 BaseType_t prvPingRequestCommand(char *pcWriteBuffer, size_t xWriteBufferLen, const char *pcCommandString);
+BaseType_t prvSendUDPMessageCommand(char *pcWriteBuffer, size_t xWriteBufferLen, const char *pcCommandString);
 
 #endif /* MYCOMMANDS_H_ */

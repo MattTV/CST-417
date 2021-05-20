@@ -855,6 +855,12 @@
     <Compile Include="src\myEchoServer.h">
       <SubType>compile</SubType>
     </Compile>
+    <Compile Include="src\myUDPServer.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\myUDPServer.h">
+      <SubType>compile</SubType>
+    </Compile>
     <None Include="src\asf.h">
       <SubType>compile</SubType>
     </None>

@@ -5,6 +5,8 @@
  * Modifications:   
  *	April 6, 2021 - Added commands get-mac, get-ip, get-gateway, get-dns, get-netmask, and send-arp.
  *	April 9, 2021 - Added documentation for new commands and updated this header block.
+ *	May 13, 2021  - Added and documented the udp-send command and the functions to make it work.
+ *	May 20, 2021  - Completed the udp-send command implementation.
  *
  * Lab/Assignment:	UDP CLI Commands
  *
@@ -32,6 +34,8 @@
 
 /* My Includes */
 #include "myCommands.h"
+
+#define MY_UDP_PORT_NUMBER	9930
 
 // Command Definitions
 static const CLI_Command_Definition_t xNetUp =
@@ -90,6 +94,13 @@ static const CLI_Command_Definition_t xOutputARPRequest =
 	prvOutputARPCommand,	// The function to run.
 	1	// The number of parameters expected.
 };
+static const CLI_Command_Definition_t xSendUDPMessage =
+{
+	"udp-send",	// The command name
+	"\r\nudp-send <host> <message>\r\nExample: udp-send 10.101.131.58 \"Hello World\"\r\n",	// The help string
+	prvSendUDPMessageCommand,	// The function to run
+	2	// The number of parameters expected
+};
 
 /************************************************************************************************
 * Purpose: vRegisterMyCommands uses an operating system function to register user-defined commands with the operating system.
@@ -111,6 +122,7 @@ void vRegisterMyCommands(void)
 	FreeRTOS_CLIRegisterCommand( &xGetDNSServer );
 	FreeRTOS_CLIRegisterCommand( &xGetNetmask );
 	FreeRTOS_CLIRegisterCommand( &xOutputARPRequest );
+	FreeRTOS_CLIRegisterCommand( &xSendUDPMessage );
 }
 
 // The commands themselves.
@@ -368,9 +380,66 @@ BaseType_t prvDnsLookupCommand(char *pcWriteBuffer, size_t xWriteBufferLen, cons
     }
     else
     {
-        sprintf(pcWriteBuffer, "%s", "DNS Failed: Could not retreive parameter\r\n");
+        sprintf(pcWriteBuffer, "%s", "DNS Failed: Could not retrieve parameter\r\n");
     }
 
     return pdFALSE;
 }
-
+/************************************************************************************************
+* Purpose: prvSendUDPMessageCommand will try to connect to a UDP server at the provided address to send the provided message.
+*
+* Precondition:
+*	A valid IP Address in the 10.101.132.58 form should be provided
+*	A message should be provided
+*
+* Postcondition:
+*	The message will be sent to the UDP server at the given address if connection succeeds.
+************************************************************************************************/
+BaseType_t prvSendUDPMessageCommand(char *pcWriteBuffer, size_t xWriteBufferLen, const char *pcCommandString)
+{
+	// 1 Socket for communication
+	Socket_t sock;
+	
+	// A struct for a destination address
+	struct freertos_sockaddr xSendUDPMessageAddress;
+	xSendUDPMessageAddress.sin_port = FreeRTOS_htons(MY_UDP_PORT_NUMBER);
+	// A struct for the local address
+	struct freertos_sockaddr xLocalAddress;
+	xLocalAddress.sin_port = MY_UDP_PORT_NUMBER;
+	
+	// Get the IP address argument
+	BaseType_t addrlen;
+	char* addrparam = (char*)FreeRTOS_CLIGetParameter(pcCommandString, 1, &addrlen);
+	
+	// Get the message
+	BaseType_t msglen;
+	char* msg = (char*)FreeRTOS_CLIGetParameter(pcCommandString, 2, &msglen);
+	
+	// Null-terminate both strings.
+	addrparam[addrlen] = '\0';
+	msg[msglen] = '\0';
+	
+	// Put the address into the socket address struct. Done here because it needs the null terminator, but the second parameter must be grabbed before the null-terminator is added.
+	xSendUDPMessageAddress.sin_addr = FreeRTOS_inet_addr(addrparam);
+	
+	// Open the socket with settings for UDP
+	sock = FreeRTOS_socket(FREERTOS_AF_INET, FREERTOS_SOCK_DGRAM, FREERTOS_IPPROTO_UDP);
+	
+	// If the socket opened properly
+	if (sock != FREERTOS_INVALID_SOCKET)
+	{
+		// Bind the socket
+		BaseType_t ret = FreeRTOS_bind(sock, &xLocalAddress, sizeof(xLocalAddress));
+		// If the socket binded properly
+		if (ret == 0)
+		{
+			// Send the message
+			ret = FreeRTOS_sendto(sock, msg, msglen, 0, &xSendUDPMessageAddress, sizeof(xSendUDPMessageAddress));
+		}
+		
+		// Close the socket once finished
+		FreeRTOS_closesocket(sock);
+	}
+	
+	return pdFALSE;
+}
