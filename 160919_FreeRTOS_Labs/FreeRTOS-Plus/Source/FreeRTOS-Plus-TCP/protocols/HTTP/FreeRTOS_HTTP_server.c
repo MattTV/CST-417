@@ -75,6 +75,8 @@
 /* FreeRTOS+FAT includes. */
 #include "ff_stdio.h"
 
+#include "myGlobals.h"
+
 #ifndef HTTP_SERVER_BACKLOG
 	#define HTTP_SERVER_BACKLOG			( 12 )
 #endif
@@ -103,6 +105,7 @@ static const char *pcGetContentsType( const char *apFname );
 static BaseType_t prvOpenURL( HTTPClient_t *pxClient );
 static BaseType_t prvSendFile( HTTPClient_t *pxClient );
 static BaseType_t prvSendReply( HTTPClient_t *pxClient, BaseType_t xCode );
+static BaseType_t prvPostProcessTest(HTTPClient_t * pxClient);
 
 static const char pcEmptyString[1] = { '\0' };
 
@@ -128,6 +131,9 @@ static TypeCouple_t pxTypeCouples[ ] =
 	{ "ttf",  "application/x-font-ttf" },
 	{ "ttc",  "application/x-font-ttf" }
 };
+
+char ip[NAME_MAX_LENGTH] = { '\0' };
+char port[NAME_MAX_LENGTH] = { '\0' };
 
 void vHTTPClientDelete( TCPClient_t *pxTCPClient )
 {
@@ -326,12 +332,19 @@ BaseType_t xResult = 0;
 	switch( xIndex )
 	{
 	case ECMD_GET:
-		xResult = prvOpenURL( pxClient );
+        xResult = prvOpenURL( pxClient );
 		break;
-
 	case ECMD_HEAD:
 	case ECMD_POST:
+        FreeRTOS_printf(("Post Command Processing: %s\n%s\n", pxClient->pcUrlData, pxClient->pcCurrentFilename));
+        prvPostProcessTest(pxClient);
+        xResult = prvOpenURL(pxClient);
+        break;
 	case ECMD_PUT:
+        FreeRTOS_debug_printf(("Got To HTTP Put\n"));
+        FreeRTOS_printf(("%s\n", pxClient->pcCurrentFilename));
+        xResult = prvOpenURL(pxClient);
+        break;
 	case ECMD_DELETE:
 	case ECMD_TRACE:
 	case ECMD_OPTIONS:
@@ -453,3 +466,61 @@ static const char *pcGetContentsType (const char *apFname)
 	return pcResult;
 }
 
+static BaseType_t prvPostProcessTest(HTTPClient_t * pxClient)
+{
+    char * tempPointer;
+    int i = 0;
+    BaseType_t xReturn = pdFALSE;
+    
+    tempPointer = strstr(pxClient->pcRestData, "ip=");
+    if(tempPointer != NULL)
+    {
+        tempPointer += (int)strlen("ip=");
+
+        memset(ip, '\0', NAME_MAX_LENGTH);
+
+        while(tempPointer[i] != '\0' && tempPointer[i] != '&')
+        {
+            if(tempPointer[i] == '+')
+            {
+                ip[i] = ' ';
+            }
+            else
+            {
+                ip[i] = tempPointer[i];
+            }
+            i++;
+        }
+
+        FreeRTOS_printf(("%s\r\n", ip));
+
+        xReturn = pdTRUE;
+    }
+	i = 0;
+	tempPointer = strstr(pxClient->pcRestData, "port=");
+	if(tempPointer != NULL)
+	{
+		tempPointer += (int)strlen("port=");
+
+		memset(port, '\0', NAME_MAX_LENGTH);
+
+		while(tempPointer[i] != '\0' && tempPointer[i] != '&')
+		{
+			if(tempPointer[i] == '+')
+			{
+				port[i] = ' ';
+			}
+			else
+			{
+				port[i] = tempPointer[i];
+			}
+			i++;
+		}
+
+		FreeRTOS_printf(("%s\r\n", port));
+
+		xReturn = pdTRUE;
+	}
+
+    return xReturn;
+}

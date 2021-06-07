@@ -34,6 +34,7 @@
 
 /* My Includes */
 #include "myCommands.h"
+#include "myGlobals.h"
 
 #define MY_UDP_PORT_NUMBER	9930
 
@@ -97,9 +98,16 @@ static const CLI_Command_Definition_t xOutputARPRequest =
 static const CLI_Command_Definition_t xSendUDPMessage =
 {
 	"udp-send",	// The command name
-	"\r\nudp-send <host> <message>\r\nExample: udp-send 10.101.131.58 \"Hello World\"\r\n",	// The help string
+	"\r\nudp-send <message>\r\nExample: udp-send hello\r\n",	// The help string
 	prvSendUDPMessageCommand,	// The function to run
-	2	// The number of parameters expected
+	1	// The number of parameters expected
+};
+static const CLI_Command_Definition_t xPrintName =
+{
+	"print-name",	// Command name
+	"\r\nprint-name\r\nExample: print-name\r\n",	// Help message
+	prvPrintNameCommand,	// Function to call
+	0	// Number of parameters expected
 };
 
 /************************************************************************************************
@@ -123,6 +131,7 @@ void vRegisterMyCommands(void)
 	FreeRTOS_CLIRegisterCommand( &xGetNetmask );
 	FreeRTOS_CLIRegisterCommand( &xOutputARPRequest );
 	FreeRTOS_CLIRegisterCommand( &xSendUDPMessage );
+	FreeRTOS_CLIRegisterCommand( &xPrintName );
 }
 
 // The commands themselves.
@@ -389,8 +398,8 @@ BaseType_t prvDnsLookupCommand(char *pcWriteBuffer, size_t xWriteBufferLen, cons
 * Purpose: prvSendUDPMessageCommand will try to connect to a UDP server at the provided address to send the provided message.
 *
 * Precondition:
-*	A valid IP Address in the 10.101.132.58 form should be provided
-*	A message should be provided
+*	A valid IP Address in the 10.101.132.58 form should be given in the website form
+*	A message should be provided in the website form
 *
 * Postcondition:
 *	The message will be sent to the UDP server at the given address if connection succeeds.
@@ -402,25 +411,18 @@ BaseType_t prvSendUDPMessageCommand(char *pcWriteBuffer, size_t xWriteBufferLen,
 	
 	// A struct for a destination address
 	struct freertos_sockaddr xSendUDPMessageAddress;
-	xSendUDPMessageAddress.sin_port = FreeRTOS_htons(MY_UDP_PORT_NUMBER);
+	xSendUDPMessageAddress.sin_port = FreeRTOS_htons(atoi(port));
 	// A struct for the local address
 	struct freertos_sockaddr xLocalAddress;
 	xLocalAddress.sin_port = MY_UDP_PORT_NUMBER;
 	
-	// Get the IP address argument
-	BaseType_t addrlen;
-	char* addrparam = (char*)FreeRTOS_CLIGetParameter(pcCommandString, 1, &addrlen);
+	// Put the address into the socket address struct
+	xSendUDPMessageAddress.sin_addr = FreeRTOS_inet_addr(ip);
 	
-	// Get the message
+	// Get the message and null-terminate the string
 	BaseType_t msglen;
-	char* msg = (char*)FreeRTOS_CLIGetParameter(pcCommandString, 2, &msglen);
-	
-	// Null-terminate both strings.
-	addrparam[addrlen] = '\0';
+	char* msg = (char*)FreeRTOS_CLIGetParameter(pcCommandString, 1, &msglen);
 	msg[msglen] = '\0';
-	
-	// Put the address into the socket address struct. Done here because it needs the null terminator, but the second parameter must be grabbed before the null-terminator is added.
-	xSendUDPMessageAddress.sin_addr = FreeRTOS_inet_addr(addrparam);
 	
 	// Open the socket with settings for UDP
 	sock = FreeRTOS_socket(FREERTOS_AF_INET, FREERTOS_SOCK_DGRAM, FREERTOS_IPPROTO_UDP);
@@ -442,4 +444,28 @@ BaseType_t prvSendUDPMessageCommand(char *pcWriteBuffer, size_t xWriteBufferLen,
 	}
 	
 	return pdFALSE;
+}
+/************************************************************************************************
+* Purpose: prvPrintNameCommand prints out the name from the website.
+*
+* Precondition:
+*
+* Postcondition:
+*	The name from the webpage will be printed out into pcWriteBuffer.
+************************************************************************************************/
+BaseType_t prvPrintNameCommand(char *pcWriteBuffer, size_t xWriteBufferLen, const char *pcCommandString)
+{
+	BaseType_t xReturnValue = pdFALSE;
+	
+	// Get rid of unused variable warnings
+	(void)pcCommandString;
+	(void)xWriteBufferLen;
+	configASSERT(pcWriteBuffer);
+	
+	// Start out with an empty string
+	pcWriteBuffer[0] = '\0';
+	
+	//sprintf(pcWriteBuffer, "Name is %s\r\n", myName);
+	
+	return xReturnValue;
 }

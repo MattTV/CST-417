@@ -156,8 +156,8 @@ FreeRTOS+TCP using a tool such as EchoTool https://github.com/PavelBansky/EchoTo
 (a pre-built binary is available).
 See http://www.freertos.org/FreeRTOS-Plus/FreeRTOS_Plus_TCP/TCP_Echo_Server.html
 */
-#define mainCREATE_FTP_SERVER					0
-#define mainCREATE_HTTP_SERVER 					0
+#define mainCREATE_FTP_SERVER					1
+#define mainCREATE_HTTP_SERVER 					1
 #define mainCREATE_UDP_CLI_TASKS				1
 #define mainCREATE_TCP_ECHO_CLIENT_TASKS_SINGLE	0
 #define mainCREATE_SIMPLE_TCP_ECHO_SERVER		1
@@ -188,7 +188,7 @@ See http://www.freertos.org/FreeRTOS-Plus/FreeRTOS_Plus_TCP/TCP_Echo_Server.html
 /* Other configuration parameters -------------------------------------------*/
 
 /* The SD card is mounted in the root of the file system. */
-#define mainHAS_SDCARD					0
+#define mainHAS_SDCARD					1
 #define mainSD_CARD_DISK_NAME			"/"
 #define mainSD_CARD_TESTING_DIRECTORY	"/fattest"
 

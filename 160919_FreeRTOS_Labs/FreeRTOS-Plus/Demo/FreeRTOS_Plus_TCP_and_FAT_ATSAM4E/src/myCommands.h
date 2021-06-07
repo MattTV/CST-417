@@ -32,5 +32,6 @@ BaseType_t prvOutputARPCommand(char *pcWriteBuffer, size_t xWriteBufferLen, cons
 BaseType_t prvArpReqCommand(char *pcWriteBuffer, size_t xWriteBufferLen, const char *pcCommandString);
 BaseType_t prvPingRequestCommand(char *pcWriteBuffer, size_t xWriteBufferLen, const char *pcCommandString);
 BaseType_t prvSendUDPMessageCommand(char *pcWriteBuffer, size_t xWriteBufferLen, const char *pcCommandString);
+BaseType_t prvPrintNameCommand(char *pcWriteBuffer, size_t xWriteBufferLen, const char *pcCommandString);
 
 #endif /* MYCOMMANDS_H_ */
